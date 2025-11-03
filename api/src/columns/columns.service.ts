@@ -164,19 +164,20 @@ export class ColumnsService {
         throw new NotFoundException('Datetime summary NOT FOUND!');
       }
 
-      let datetimeDataArray: { value: Date }[];
+      let datetimeDataArray: { value: Date | null }[];
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       if (colSeries.dtype.toString() === pl.Datetime('us').toString()) {
         datetimeDataArray = dataArray.map((entry) => {
           return {
-            value: new Date(Math.floor(entry.value / 1000))
+            value: entry.value === undefined || entry.value === null ? new Date(Math.floor(entry.value / 1000)) : null
           };
         });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       } else if (colSeries.dtype.toString() === pl.Datetime('ns').toString()) {
         datetimeDataArray = dataArray.map((entry) => {
           return {
-            value: new Date(Math.floor(entry.value / 1000000))
+            value:
+              entry.value === undefined || entry.value === null ? new Date(Math.floor(entry.value / 1000000)) : null
           };
         });
       } else {
