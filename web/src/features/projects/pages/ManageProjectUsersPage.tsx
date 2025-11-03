@@ -16,7 +16,7 @@ const ManageProjectUsersPage = () => {
 
   const addProjectUser = (userEmailToAdd: string) => {
     axios
-      .post(`/v1/projects/add-user/${projectId}/${userEmailToAdd}`)
+      .post(`/v1/projects/add-user/${projectId}/${encodeURIComponent(userEmailToAdd)}`)
       .then(() => {
         addNotification({
           message: `User with Email ${userEmailToAdd} has been added to the current project`,
