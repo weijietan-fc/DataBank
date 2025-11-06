@@ -17,7 +17,8 @@ const $ViewOneDatasetPageSearchParams = z.object({
 const getViewDatasetQueryOptions = (
   datasetId: string,
   columnPagination: $DatasetViewPagination,
-  rowPagination: $DatasetViewPagination
+  rowPagination: $DatasetViewPagination,
+  queryKey: string
 ) => {
   const dataQueryUrl = `/v1/datasets/${datasetId}`;
   return queryOptions({
@@ -28,9 +29,7 @@ const getViewDatasetQueryOptions = (
       });
       return $TabularDataset.parse(response.data);
     },
-    queryKey: [
-      `dataset-query-${datasetId}-colPage-${columnPagination.currentPage}-colItems-${columnPagination.itemsPerPage}-rowPage-${rowPagination.currentPage}-rowItems-${rowPagination.itemsPerPage}`
-    ]
+    queryKey: [queryKey]
   });
 };
 
@@ -38,7 +37,13 @@ export const Route = createFileRoute('/portal/datasets/$datasetId')({
   validateSearch: zodValidator($ViewOneDatasetPageSearchParams),
   loaderDeps: ({ search: { columnPagination, rowPagination } }) => ({ columnPagination, rowPagination }),
   loader: async ({ deps: { columnPagination, rowPagination }, params }) => {
-    const viewOneDatasetOptions = getViewDatasetQueryOptions(params.datasetId, columnPagination, rowPagination);
+    const queryKey = `dataset-query-${params.datasetId}-colPage-${columnPagination.currentPage}-colItems-${columnPagination.itemsPerPage}-rowPage-${rowPagination.currentPage}-rowItems-${rowPagination.itemsPerPage}`;
+    const viewOneDatasetOptions = getViewDatasetQueryOptions(
+      params.datasetId,
+      columnPagination,
+      rowPagination,
+      queryKey
+    );
     await queryClient.ensureQueryData(viewOneDatasetOptions);
   },
   component: () => {
@@ -46,7 +51,13 @@ export const Route = createFileRoute('/portal/datasets/$datasetId')({
     const params = useParams({ from: '/portal/datasets/$datasetId' });
     const downloadDataUrl = `/v1/datasets/download-data/`;
     const downloadMetaDataUrl = `/v1/datasets/download-metadata/`;
-    const viewOneDatasetOptions = getViewDatasetQueryOptions(params.datasetId, columnPagination, rowPagination);
+    const queryKey = `dataset-query-${params.datasetId}-colPage-${columnPagination.currentPage}-colItems-${columnPagination.itemsPerPage}-rowPage-${rowPagination.currentPage}-rowItems-${rowPagination.itemsPerPage}`;
+    const viewOneDatasetOptions = getViewDatasetQueryOptions(
+      params.datasetId,
+      columnPagination,
+      rowPagination,
+      queryKey
+    );
 
     const datasetQuery = useSuspenseQuery(viewOneDatasetOptions);
     const dataset = datasetQuery.data;
@@ -57,6 +68,7 @@ export const Route = createFileRoute('/portal/datasets/$datasetId')({
         dataset={dataset}
         downloadDataUrl={downloadDataUrl}
         downloadMetaDataUrl={downloadMetaDataUrl}
+        queryKey={queryKey}
         rowPagination={rowPagination}
       />
     );

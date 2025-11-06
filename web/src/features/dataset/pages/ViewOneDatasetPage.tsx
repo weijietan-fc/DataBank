@@ -24,6 +24,7 @@ type ViewOneDatasetPageProps = {
   dataset: $TabularDataset;
   downloadDataUrl: string;
   downloadMetaDataUrl: string;
+  queryKey: string;
   rowPagination: $DatasetViewPagination;
 };
 
@@ -32,7 +33,8 @@ const ViewOneDatasetPage = ({
   downloadDataUrl,
   downloadMetaDataUrl,
   columnPagination,
-  rowPagination
+  rowPagination,
+  queryKey
 }: ViewOneDatasetPageProps) => {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -205,7 +207,7 @@ const ViewOneDatasetPage = ({
                 totalNumberOfItems={dataset.totalNumberOfColumns}
               />
 
-              <DatasetTable isManager={isManager} isProject={false} {...dataset} />
+              <DatasetTable isManager={isManager} isProject={false} queryKey={queryKey} {...dataset} />
 
               <DatasetPagination
                 currentPage={rowPagination.currentPage}

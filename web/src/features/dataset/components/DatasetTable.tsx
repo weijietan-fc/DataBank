@@ -6,7 +6,11 @@ import { ChevronDownIcon, QuestionMarkCircleIcon, TrashIcon } from '@heroicons/r
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-type DatasetTableProps = Omit<$TabularDataset, 'permission'> & { isManager: boolean; isProject: boolean };
+type DatasetTableProps = Omit<$TabularDataset, 'permission'> & {
+  isManager: boolean;
+  isProject: boolean;
+  queryKey: string;
+};
 
 export const DatasetTable = (tabularDataset: DatasetTableProps) => {
   const { t } = useTranslation('common');
@@ -24,6 +28,9 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
             message: `The metadata permission level of column with Id ${columnId} has been modified`,
             type: 'success'
           });
+          void queryClient.invalidateQueries({
+            queryKey: [tabularDataset.queryKey]
+          });
         })
         .catch((error) => {
           console.error(error);
@@ -32,7 +39,6 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
             type: 'error'
           });
         });
-      await queryClient.invalidateQueries({ queryKey: ['dataset-query'] });
     }
   );
 
@@ -47,6 +53,7 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
             message: `The data permission level of column with Id ${columnId} has been modified`,
             type: 'success'
           });
+          void queryClient.invalidateQueries({ queryKey: [tabularDataset.queryKey] });
         })
         .catch((error) => {
           console.error(error);
@@ -55,7 +62,6 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
             type: 'error'
           });
         });
-      await queryClient.invalidateQueries({ queryKey: ['dataset-query'] });
     }
   );
 
@@ -67,6 +73,7 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
           message: `The nullability of column with Id ${columnId} has been modified`,
           type: 'success'
         });
+        void queryClient.invalidateQueries({ queryKey: [tabularDataset.queryKey] });
       })
       .catch((error) => {
         console.error(error);
@@ -75,7 +82,6 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
           type: 'error'
         });
       });
-    await queryClient.invalidateQueries({ queryKey: ['dataset-query'] });
   };
 
   const handleChangeColumnType = useDestructiveAction(async (columnId: string, type: $ColumnType) => {
@@ -86,6 +92,7 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
           message: `The data type of column with Id ${columnId} has been modified`,
           type: 'success'
         });
+        void queryClient.invalidateQueries({ queryKey: [tabularDataset.queryKey] });
       })
       .catch((error) => {
         console.error(error);
@@ -94,7 +101,6 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
           type: 'error'
         });
       });
-    await queryClient.invalidateQueries({ queryKey: ['dataset-query'] });
   });
 
   const handleDeleteColumn = useDestructiveAction(async (columnId: string) => {
@@ -105,6 +111,7 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
           message: `The column with Id ${columnId} has been deleted.`,
           type: 'success'
         });
+        void queryClient.invalidateQueries({ queryKey: [tabularDataset.queryKey] });
       })
       .catch((error) => {
         console.error(error);
@@ -113,7 +120,6 @@ export const DatasetTable = (tabularDataset: DatasetTableProps) => {
           type: 'error'
         });
       });
-    await queryClient.invalidateQueries({ queryKey: ['dataset-query'] });
   });
 
   const getSummary = (columnName: string) => {
