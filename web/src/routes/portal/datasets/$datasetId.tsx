@@ -14,6 +14,13 @@ const $ViewOneDatasetPageSearchParams = z.object({
   rowPagination: $DatasetViewPagination.default({ currentPage: 1, itemsPerPage: 10 })
 });
 
+const getDatasetQueryKey = (
+  datasetId: string,
+  columnPagination: $DatasetViewPagination,
+  rowPagination: $DatasetViewPagination
+) =>
+  `dataset-query-${datasetId}-colPage-${columnPagination.currentPage}-colItems-${columnPagination.itemsPerPage}-rowPage-${rowPagination.currentPage}-rowItems-${rowPagination.itemsPerPage}`;
+
 const getViewDatasetQueryOptions = (
   datasetId: string,
   columnPagination: $DatasetViewPagination,
@@ -37,12 +44,11 @@ export const Route = createFileRoute('/portal/datasets/$datasetId')({
   validateSearch: zodValidator($ViewOneDatasetPageSearchParams),
   loaderDeps: ({ search: { columnPagination, rowPagination } }) => ({ columnPagination, rowPagination }),
   loader: async ({ deps: { columnPagination, rowPagination }, params }) => {
-    const queryKey = `dataset-query-${params.datasetId}-colPage-${columnPagination.currentPage}-colItems-${columnPagination.itemsPerPage}-rowPage-${rowPagination.currentPage}-rowItems-${rowPagination.itemsPerPage}`;
     const viewOneDatasetOptions = getViewDatasetQueryOptions(
       params.datasetId,
       columnPagination,
       rowPagination,
-      queryKey
+      getDatasetQueryKey(params.datasetId, columnPagination, rowPagination)
     );
     await queryClient.ensureQueryData(viewOneDatasetOptions);
   },
@@ -51,7 +57,8 @@ export const Route = createFileRoute('/portal/datasets/$datasetId')({
     const params = useParams({ from: '/portal/datasets/$datasetId' });
     const downloadDataUrl = `/v1/datasets/download-data/`;
     const downloadMetaDataUrl = `/v1/datasets/download-metadata/`;
-    const queryKey = `dataset-query-${params.datasetId}-colPage-${columnPagination.currentPage}-colItems-${columnPagination.itemsPerPage}-rowPage-${rowPagination.currentPage}-rowItems-${rowPagination.itemsPerPage}`;
+    const queryKey = getDatasetQueryKey(params.datasetId, columnPagination, rowPagination);
+
     const viewOneDatasetOptions = getViewDatasetQueryOptions(
       params.datasetId,
       columnPagination,
