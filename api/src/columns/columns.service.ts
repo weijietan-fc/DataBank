@@ -724,7 +724,7 @@ export class ColumnsService {
           data: {
             datetimeColumnValidation: {
               max: new Date(),
-              min: '1970-01-01'
+              min: new Date()
             },
             datetimeData: data.toArray().map((entry: Date) => {
               return { value: entry };
@@ -890,10 +890,13 @@ export class ColumnsService {
       case 'DATETIME':
         return {
           count: currSeries.len() - currSeries.nullCount(),
-          datetimeSummary: {
-            max: new Date(Math.floor(currSeries.cast(pl.Datetime('ns'), true).max() / 1000000)),
-            min: new Date(Math.floor(currSeries.cast(pl.Datetime('ns'), true).min() / 1000000))
-          },
+          datetimeSummary:
+            currSeries.len === currSeries.nullCount
+              ? null
+              : {
+                  max: new Date(Math.floor(currSeries.cast(pl.Datetime('ns'), true).max() / 1000000)),
+                  min: new Date(Math.floor(currSeries.cast(pl.Datetime('ns'), true).min() / 1000000))
+                },
           nullCount: currSeries.nullCount()
         };
       case 'ENUM':
